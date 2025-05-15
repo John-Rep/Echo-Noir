@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: f8c14f2814b4b124a894a65c32c44987
+guid: 14ae706fef2303e4cb71112dbd5d250b
 AudioImporter:
   externalObjects: {}
   serializedVersion: 6
@@ -11,8 +11,8 @@ AudioImporter:
     quality: 1
     conversionMode: 0
   platformSettingOverrides: {}
-  forceToMono: 1
-  normalize: 0
+  forceToMono: 0
+  normalize: 1
   preloadAudioData: 1
   loadInBackground: 0
   ambisonic: 0
@@ -22,8 +22,8 @@ AudioImporter:
   assetBundleVariant: 
 AssetOrigin:
   serializedVersion: 1
-  productId: 174710
-  packageName: Mini First Person Controller
-  packageVersion: 1.1.0
-  assetPath: Assets/Mini First Person Controller/Audio/Steps.wav
-  uploadId: 442605
+  productId: 189879
+  packageName: Footsteps - Essentials
+  packageVersion: 1.3
+  assetPath: Assets/Footsteps - Essentials/Footsteps_Tile/Footsteps_Tile_Walk/Footsteps_Tile_Walk_06.wav
+  uploadId: 473093

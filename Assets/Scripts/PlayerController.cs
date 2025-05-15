@@ -10,7 +10,7 @@ public class PlayerController : MonoBehaviour
 
     Rigidbody rb;
     public float speed = 3f, sprintSpeed = 6f, crouchSpeed = 1f, maxLookAngle = 30, speedSoundThreshold = .04f;
-    public float stepSpeed = .3f;
+    public float stepSpeed = .7f, sprintStepSpeed = .3f, walkIntensity = 7f, sprintIntensity = 13f;
     [SerializeField] float timeSinceStep = 0f;
     InputAction moveAction, sprintAction, crouchAction, lookAction;
     Vector2 move, look;
@@ -48,9 +48,13 @@ public class PlayerController : MonoBehaviour
         rb.MovePosition(rb.transform.position + transform.forward * move.y + transform.right * move.x);
 
         float currentSpeed = move.magnitude;
-        if (currentSpeed > speedSoundThreshold && timeSinceStep > stepSpeed)
+        if (currentSpeed > speedSoundThreshold && sprint == 0 && timeSinceStep > stepSpeed)
         {
-            gameManager.GetComponent<AudioController>().CreateSound(transform.position + transform.forward, moveSound, stepSpeed + .2f);
+            gameManager.GetComponent<AudioController>().CreateSound(transform.position + transform.forward, "step", walkIntensity);
+            timeSinceStep = 0;
+        } else if (currentSpeed > speedSoundThreshold && sprint > 0 && timeSinceStep > sprintStepSpeed)
+        {
+            gameManager.GetComponent<AudioController>().CreateSound(transform.position + transform.forward, "run", sprintIntensity);
             timeSinceStep = 0;
         }
         timeSinceStep += Time.fixedDeltaTime;
