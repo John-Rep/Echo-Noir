@@ -28,7 +28,7 @@ git clone https://github.com/John-Rep/Echo-Noir.git
 
 2. Cliquez sur "Add" ou "Open".
 
-3. Sélectionnez le dossier que vous venez de cloner (NomDuDepot/).
+3. Sélectionnez le dossier que vous venez de cloner (Echo-Noir/).
 
 4. Assurez-vous que la version de Unity sélectionnée correspond à celle utilisée pour le projet.
 
