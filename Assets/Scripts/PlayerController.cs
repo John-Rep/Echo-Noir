@@ -1,27 +1,25 @@
 using System;
-using Unity.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
-using UnityEngine.Audio;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
 
     Rigidbody rb;
-    public float speed = 3f, sprintSpeed = 6f, crouchSpeed = 1f, maxLookAngle = 30, speedSoundThreshold = .04f;
-    public float stepSpeed = .7f, sprintStepSpeed = .3f, walkIntensity = 7f, sprintIntensity = 13f;
-    [SerializeField] float timeSinceStep = 0f;
+    public float speed = 3f, sprintSpeed = 6f, crouchSpeed = 1.5f, maxLookAngle = 30;
+    public float stepSpeed = .7f, sprintStepSpeed = .3f, walkIntensity = 4.5f, sprintIntensity = 10f;
+    float timeSinceStep = 0f;
     InputAction moveAction, sprintAction, crouchAction, lookAction;
     Vector2 move, look;
-    public AudioResource moveSound;
     public Vector2 rotationSpeed = new Vector2(20f, 5f);
     float sprint, crouch;
-    public GameObject view, gameManager;
+    GameObject view, gameManager;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        view = transform.GetChild(0).GameObject();
         gameManager = GameObject.FindGameObjectWithTag("GameController");
         rb = GetComponent<Rigidbody>();
         moveAction = InputSystem.actions.FindAction("Move");
@@ -46,16 +44,17 @@ public class PlayerController : MonoBehaviour
         }
         move = moveAction.ReadValue<Vector2>() * finalSpeed * Time.fixedDeltaTime;
         rb.MovePosition(rb.transform.position + transform.forward * move.y + transform.right * move.x);
-
-        float currentSpeed = move.magnitude;
-        if (currentSpeed > speedSoundThreshold && sprint == 0 && timeSinceStep > stepSpeed)
+        if (move.magnitude > 0)
         {
-            gameManager.GetComponent<AudioController>().CreateSound(transform.position + transform.forward, "step", walkIntensity);
-            timeSinceStep = 0;
-        } else if (currentSpeed > speedSoundThreshold && sprint > 0 && timeSinceStep > sprintStepSpeed)
-        {
-            gameManager.GetComponent<AudioController>().CreateSound(transform.position + transform.forward, "run", sprintIntensity);
-            timeSinceStep = 0;
+            if (finalSpeed == speed && timeSinceStep > stepSpeed)
+            {
+                gameManager.GetComponent<AudioController>().CreateSound(transform.position + transform.forward, "step", walkIntensity);
+                timeSinceStep = 0;
+            } else if (finalSpeed == sprintSpeed && timeSinceStep > sprintStepSpeed)
+            {
+                gameManager.GetComponent<AudioController>().CreateSound(transform.position + transform.forward, "run", sprintIntensity);
+                timeSinceStep = 0;
+            }
         }
         timeSinceStep += Time.fixedDeltaTime;
 
@@ -74,7 +73,5 @@ public class PlayerController : MonoBehaviour
         }
         
         view.transform.localEulerAngles = new Vector3(newLook, 0f, 0f);
-
-        Debug.DrawRay(view.transform.position, view.transform.forward * 5f, Color.red);
     }
 }
