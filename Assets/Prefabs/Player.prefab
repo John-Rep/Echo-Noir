@@ -297,7 +297,9 @@ MonoBehaviour:
   sprintStepSpeed: 0.3
   walkIntensity: 4.5
   sprintIntensity: 10
+  throwSpeed: 8
   rotationSpeed: {x: 20, y: 5}
+  rock: {fileID: 6436002347103123853, guid: c8c21cee4f8413d41a7661393b33a597, type: 3}
 --- !u!1 &8514701531900495588
 GameObject:
   m_ObjectHideFlags: 0

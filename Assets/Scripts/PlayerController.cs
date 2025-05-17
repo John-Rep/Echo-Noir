@@ -8,13 +8,14 @@ public class PlayerController : MonoBehaviour
 
     Rigidbody rb;
     public float speed = 3f, sprintSpeed = 6f, crouchSpeed = 1.5f, maxLookAngle = 30;
-    public float stepSpeed = .7f, sprintStepSpeed = .3f, walkIntensity = 4.5f, sprintIntensity = 10f;
+    public float stepSpeed = .7f, sprintStepSpeed = .3f, walkIntensity = 4.5f, sprintIntensity = 10f, throwSpeed = 8f;
     float timeSinceStep = 0f;
-    InputAction moveAction, sprintAction, crouchAction, lookAction;
+    InputAction moveAction, sprintAction, crouchAction, lookAction, throwAction;
     Vector2 move, look;
     public Vector2 rotationSpeed = new Vector2(20f, 5f);
     float sprint, crouch;
     GameObject view, gameManager;
+    public GameObject rock;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -26,6 +27,9 @@ public class PlayerController : MonoBehaviour
         sprintAction = InputSystem.actions.FindAction("Sprint");
         crouchAction = InputSystem.actions.FindAction("Crouch");
         lookAction = InputSystem.actions.FindAction("Look");
+        throwAction = InputSystem.actions.FindAction("Interact");
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     // Update is called once per frame
@@ -50,7 +54,8 @@ public class PlayerController : MonoBehaviour
             {
                 gameManager.GetComponent<AudioController>().CreateSound(transform.position + transform.forward, "step", walkIntensity);
                 timeSinceStep = 0;
-            } else if (finalSpeed == sprintSpeed && timeSinceStep > sprintStepSpeed)
+            }
+            else if (finalSpeed == sprintSpeed && timeSinceStep > sprintStepSpeed)
             {
                 gameManager.GetComponent<AudioController>().CreateSound(transform.position + transform.forward, "run", sprintIntensity);
                 timeSinceStep = 0;
@@ -71,7 +76,23 @@ public class PlayerController : MonoBehaviour
         {
             newLook = Math.Clamp(newLook, -maxLookAngle, maxLookAngle);
         }
-        
+
         view.transform.localEulerAngles = new Vector3(newLook, 0f, 0f);
+    }
+
+    public void Update()
+    {
+        if (throwAction.WasPressedThisFrame())
+        {
+            ThrowRock();
+        }
+    }
+
+    public void ThrowRock()
+    {
+        GameObject newRock = Instantiate(rock);
+        newRock.transform.position = view.transform.position + view.transform.forward - new Vector3(0, .4f, 0);
+        Vector3 direction = transform.forward + new Vector3(0, Mathf.Tan(-view.transform.localEulerAngles.x * Mathf.Deg2Rad), 0);
+        newRock.GetComponent<Rigidbody>().linearVelocity = direction * throwSpeed;
     }
 }

@@ -25,6 +25,8 @@ public class AudioController : MonoBehaviour
             case "run":
                 index = Random.Range(0, runAudios.Length);
                 return runAudios[index];
+            case "rock":
+                return stepAudios[2];
             default:
                 return null;
         }
