@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -8,16 +9,18 @@ public class PlayerController : MonoBehaviour
 
     Rigidbody rb;
     public float speed = 3f, sprintSpeed = 6f, crouchSpeed = 1.5f, maxLookAngle = 30;
-    public float stepSpeed = .7f, sprintStepSpeed = .3f, walkIntensity = 4.5f, sprintIntensity = 10f, throwSpeed = 8f;
+    public float stepSpeed = .7f, sprintStepSpeed = .3f, walkIntensity = 4.5f, sprintIntensity = 10f, throwSpeed = 8f, throwAngle = 45f, throwModificationMultiplier = .2f;
     float timeSinceStep = 0f;
-    InputAction moveAction, sprintAction, crouchAction, lookAction, throwAction, pickupAction;
+    InputAction moveAction, sprintAction, crouchAction, lookAction, throwAction, interactAction;
     Vector2 move, look;
     public Vector2 rotationSpeed = new Vector2(20f, 5f);
     float sprint, crouch;
-    [SerializeField]
+    Vector3 throwStartAdjustment = new Vector3(0, .4f, 0);
     GameObject view, gameManager, selection;
     public GameObject rock;
     public int rockCount = 2;
+    bool throwMode = false;
+    LineRenderer lr;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -25,12 +28,13 @@ public class PlayerController : MonoBehaviour
         view = transform.GetChild(0).GameObject();
         gameManager = GameObject.FindGameObjectWithTag("GameController");
         rb = GetComponent<Rigidbody>();
+        lr = GetComponent<LineRenderer>();
         moveAction = InputSystem.actions.FindAction("Move");
         sprintAction = InputSystem.actions.FindAction("Sprint");
         crouchAction = InputSystem.actions.FindAction("Crouch");
         lookAction = InputSystem.actions.FindAction("Look");
-        throwAction = InputSystem.actions.FindAction("Interact");
-        pickupAction = InputSystem.actions.FindAction("Jump");
+        interactAction = InputSystem.actions.FindAction("Interact");
+        throwAction = InputSystem.actions.FindAction("Throw");
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -70,28 +74,52 @@ public class PlayerController : MonoBehaviour
         Quaternion turnRotation = Quaternion.Euler(0f, look.x, 0f);
         rb.MoveRotation(rb.rotation * turnRotation);
 
-        float newLook = -look.y + view.transform.localEulerAngles.x;
-        if (newLook > 180)
+        if (!throwMode)
         {
-            newLook = Math.Clamp(newLook, 360 - maxLookAngle, 360);
+            float newLook = -look.y + view.transform.localEulerAngles.x;
+            if (newLook > 180)
+            {
+                newLook = Math.Clamp(newLook, 360 - maxLookAngle, 360);
+            }
+            else
+            {
+                newLook = Math.Clamp(newLook, -maxLookAngle, maxLookAngle);
+            }
+
+            view.transform.localEulerAngles = new Vector3(newLook, 0f, 0f);
         }
         else
         {
-            newLook = Math.Clamp(newLook, -maxLookAngle, maxLookAngle);
+            throwSpeed += look.y * throwModificationMultiplier;
         }
 
-        view.transform.localEulerAngles = new Vector3(newLook, 0f, 0f);
     }
 
     void Update()
     {
-        if (throwAction.WasPressedThisFrame() && rockCount > 0)
+        if (throwAction.WasPressedThisFrame() && throwMode)
+        {
+            throwMode = false;
+            lr.enabled = false;
+        }
+        else if (throwAction.WasPressedThisFrame() && rockCount > 0)
+        {
+            lr.enabled = true;
+            throwMode = true;
+        }
+        if (throwMode && interactAction.WasPressedThisFrame())
         {
             ThrowRock();
+            lr.enabled = false;
+            throwMode = false;
         }
-        if (pickupAction.WasPressedThisFrame() && selection != null)
+        else if (interactAction.WasPressedThisFrame() && selection != null)
         {
             PickUp();
+        }
+        if (throwMode)
+        {
+            DrawTrajectory();
         }
     }
 
@@ -120,9 +148,9 @@ public class PlayerController : MonoBehaviour
     void ThrowRock()
     {
         GameObject newRock = Instantiate(rock);
-        newRock.transform.position = view.transform.position + view.transform.forward - new Vector3(0, .4f, 0);
-        Vector3 direction = transform.forward + new Vector3(0, Mathf.Tan(-view.transform.localEulerAngles.x * Mathf.Deg2Rad), 0);
-        newRock.GetComponent<Rigidbody>().linearVelocity = direction * throwSpeed;
+        newRock.transform.position = view.transform.position + view.transform.forward - throwStartAdjustment;
+        Vector3 direction = transform.forward + new Vector3(0, Mathf.Tan(throwAngle * Mathf.Deg2Rad), 0);
+        newRock.GetComponent<Rigidbody>().linearVelocity = direction.normalized * throwSpeed;
         rockCount -= 1;
     }
 
@@ -130,5 +158,31 @@ public class PlayerController : MonoBehaviour
     {
         Destroy(selection);
         rockCount += 1;
+    }
+
+    void DrawTrajectory()
+    {
+        List<Vector3> positions = new List<Vector3>();
+        Vector3 newPosition = view.transform.position + view.transform.forward - throwStartAdjustment;
+        float x = 0, y = 0;
+        int index = -1;
+        float step = .02f, time = 0;
+        do
+        {
+            time += step;
+            positions.Add(newPosition);
+            x = throwSpeed * Mathf.Cos(throwAngle * Mathf.Deg2Rad) * time;
+            y = -4.9f * time * time + throwSpeed * Mathf.Sin(throwAngle * Mathf.Deg2Rad) * time;
+
+            newPosition = positions[0] + transform.forward * x + transform.up * y;
+            index++;
+        } while (!Physics.Raycast(positions[index], newPosition - positions[index], Vector3.Distance(positions[index], newPosition)) && index < 200);
+        
+        lr.positionCount = positions.Count;
+        for (int i = 0; i < positions.Count; i++)
+        {
+            positions[i] += transform.right * (positions.Count - i) / positions.Count;
+        }
+        lr.SetPositions(positions.ToArray());
     }
 }
