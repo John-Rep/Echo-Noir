@@ -5,7 +5,7 @@ using UnityEngine.Audio;
 public class AudioController : MonoBehaviour
 {
     public GameObject soundObject;
-    public AudioResource[] stepAudios, runAudios;
+    public AudioResource[] stepAudios, runAudios, rockAudios;
     public void CreateSound(Vector3 location, string audio, float intensity)
     {
         GameObject soundSphere = Instantiate(soundObject, location, new Quaternion(0, 0, 0, 0));
@@ -26,7 +26,8 @@ public class AudioController : MonoBehaviour
                 index = Random.Range(0, runAudios.Length);
                 return runAudios[index];
             case "rock":
-                return stepAudios[2];
+                index = Random.Range(0, rockAudios.Length);
+                return rockAudios[index];
             default:
                 return null;
         }

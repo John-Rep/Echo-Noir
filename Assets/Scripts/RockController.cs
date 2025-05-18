@@ -4,15 +4,29 @@ using UnityEngine;
 public class RockController : MonoBehaviour
 {
     GameObject gameManager;
-    float intensityMultiplier = 3f;
+    float intensityMultiplier = 5f;
+    Rigidbody rb;
     void Start()
     {
         gameManager = GameObject.FindGameObjectWithTag("GameController");
+        rb = GetComponentInParent<Rigidbody>();
     }
 
-    void OnTriggerEnter()
+    void Update()
     {
-        float intensity = GetComponentInParent<Rigidbody>().linearVelocity.magnitude * intensityMultiplier;
-        gameManager.GetComponent<AudioController>().CreateSound(transform.position, "rock", intensity);
+        if (rb.linearVelocity.magnitude < .5f)
+        {
+            Destroy(this);
+        }
     }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if (!other.gameObject.CompareTag("Player"))
+        {
+            float intensity = rb.linearVelocity.magnitude * intensityMultiplier;
+            gameManager.GetComponent<AudioController>().CreateSound(transform.position, "rock", intensity);
+        }
+    }
+
 }

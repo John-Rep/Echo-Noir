@@ -61,3 +61,8 @@ MonoBehaviour:
   - {fileID: 8300000, guid: e331a9e83f5b77e49bd9efba1b2c2fd9, type: 3}
   - {fileID: 8300000, guid: 8c2c6c300bd8fc441878f426377bec64, type: 3}
   - {fileID: 8300000, guid: f8e559768bed7ed4680ab0449da7ec3a, type: 3}
+  rockAudios:
+  - {fileID: 8300000, guid: 15751bedb696c2e4d8159bfb55380a05, type: 3}
+  - {fileID: 8300000, guid: 2bfcade96a7605144a1050907ada7fa6, type: 3}
+  - {fileID: 8300000, guid: 86e564470ac30ee45a316e70bb66b8ef, type: 3}
+  - {fileID: 8300000, guid: db406e9fa69f9cf4b981629211b5b1d4, type: 3}

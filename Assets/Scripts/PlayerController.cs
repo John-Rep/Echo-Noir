@@ -10,12 +10,14 @@ public class PlayerController : MonoBehaviour
     public float speed = 3f, sprintSpeed = 6f, crouchSpeed = 1.5f, maxLookAngle = 30;
     public float stepSpeed = .7f, sprintStepSpeed = .3f, walkIntensity = 4.5f, sprintIntensity = 10f, throwSpeed = 8f;
     float timeSinceStep = 0f;
-    InputAction moveAction, sprintAction, crouchAction, lookAction, throwAction;
+    InputAction moveAction, sprintAction, crouchAction, lookAction, throwAction, pickupAction;
     Vector2 move, look;
     public Vector2 rotationSpeed = new Vector2(20f, 5f);
     float sprint, crouch;
-    GameObject view, gameManager;
+    [SerializeField]
+    GameObject view, gameManager, selection;
     public GameObject rock;
+    public int rockCount = 2;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -28,6 +30,7 @@ public class PlayerController : MonoBehaviour
         crouchAction = InputSystem.actions.FindAction("Crouch");
         lookAction = InputSystem.actions.FindAction("Look");
         throwAction = InputSystem.actions.FindAction("Interact");
+        pickupAction = InputSystem.actions.FindAction("Jump");
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
@@ -80,19 +83,52 @@ public class PlayerController : MonoBehaviour
         view.transform.localEulerAngles = new Vector3(newLook, 0f, 0f);
     }
 
-    public void Update()
+    void Update()
     {
-        if (throwAction.WasPressedThisFrame())
+        if (throwAction.WasPressedThisFrame() && rockCount > 0)
         {
             ThrowRock();
         }
+        if (pickupAction.WasPressedThisFrame() && selection != null)
+        {
+            PickUp();
+        }
     }
 
-    public void ThrowRock()
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.CompareTag("Item") && other.gameObject.GetComponent<Rigidbody>().linearVelocity.magnitude < 1f)
+        {
+            if (selection != null)
+            {
+                selection.GetComponent<SelectionController>().UnSelect();
+            }
+            selection = other.gameObject;
+            selection.GetComponent<SelectionController>().Select();
+        }
+    }
+
+    void OnTriggerExit(Collider other)
+    {
+        if (other.CompareTag("Item") && selection == other.gameObject)
+        {
+            selection.GetComponent<SelectionController>().UnSelect();
+            selection = null;
+        }
+    }
+
+    void ThrowRock()
     {
         GameObject newRock = Instantiate(rock);
         newRock.transform.position = view.transform.position + view.transform.forward - new Vector3(0, .4f, 0);
         Vector3 direction = transform.forward + new Vector3(0, Mathf.Tan(-view.transform.localEulerAngles.x * Mathf.Deg2Rad), 0);
         newRock.GetComponent<Rigidbody>().linearVelocity = direction * throwSpeed;
+        rockCount -= 1;
+    }
+
+    void PickUp()
+    {
+        Destroy(selection);
+        rockCount += 1;
     }
 }

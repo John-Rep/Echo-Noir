@@ -153,7 +153,7 @@ GameObject:
   - component: {fileID: 7475115802113828595}
   m_Layer: 0
   m_Name: Player
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -299,6 +299,9 @@ MonoBehaviour:
   sprintIntensity: 10
   throwSpeed: 8
   rotationSpeed: {x: 20, y: 5}
+  view: {fileID: 0}
+  gameManager: {fileID: 0}
+  selection: {fileID: 0}
   rock: {fileID: 6436002347103123853, guid: c8c21cee4f8413d41a7661393b33a597, type: 3}
 --- !u!1 &8514701531900495588
 GameObject:
