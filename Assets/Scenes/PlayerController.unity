@@ -335,11 +335,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!1 &467607537 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 9034564294631128952, guid: 99e1fe6c6f9b79f4e9c28d67bcad2eef, type: 3}
-  m_PrefabInstance: {fileID: 3020183740909851493}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &832575517
 GameObject:
   m_ObjectHideFlags: 0
@@ -613,10 +608,26 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 7475115802113828595, guid: 1e20e8b5908e1b74eb7f6dbf2828b036, type: 3}
-      propertyPath: gameManager
+    - target: {fileID: 6499698259190051548, guid: 1e20e8b5908e1b74eb7f6dbf2828b036, type: 3}
+      propertyPath: m_Materials.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 6499698259190051548, guid: 1e20e8b5908e1b74eb7f6dbf2828b036, type: 3}
+      propertyPath: 'm_Materials.Array.data[0]'
       value: 
-      objectReference: {fileID: 467607537}
+      objectReference: {fileID: 2100000, guid: 78b135aa08b16ff4db98e891c7b69f4a, type: 2}
+    - target: {fileID: 6499698259190051548, guid: 1e20e8b5908e1b74eb7f6dbf2828b036, type: 3}
+      propertyPath: 'm_Materials.Array.data[1]'
+      value: 
+      objectReference: {fileID: 2100000, guid: 527fc11485d9ba34ebb7af069880e8f4, type: 2}
+    - target: {fileID: 6499698259190051548, guid: 1e20e8b5908e1b74eb7f6dbf2828b036, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].time
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6499698259190051548, guid: 1e20e8b5908e1b74eb7f6dbf2828b036, type: 3}
+      propertyPath: m_Parameters.widthCurve.m_Curve.Array.data[0].value
+      value: 0.08073425
+      objectReference: {fileID: 0}
     - target: {fileID: 7874617198129778729, guid: 1e20e8b5908e1b74eb7f6dbf2828b036, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0.20196
