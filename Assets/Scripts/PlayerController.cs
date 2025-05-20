@@ -59,12 +59,12 @@ public class PlayerController : MonoBehaviour
         {
             if (finalSpeed == speed && timeSinceStep > stepSpeed)
             {
-                gameManager.GetComponent<AudioController>().CreateSound(transform.position + transform.forward, "step", walkIntensity);
+                gameManager.GetComponent<AudioController>().CreateSound(transform.position, "step", walkIntensity);
                 timeSinceStep = 0;
             }
             else if (finalSpeed == sprintSpeed && timeSinceStep > sprintStepSpeed)
             {
-                gameManager.GetComponent<AudioController>().CreateSound(transform.position + transform.forward, "run", sprintIntensity);
+                gameManager.GetComponent<AudioController>().CreateSound(transform.position, "run", sprintIntensity);
                 timeSinceStep = 0;
             }
         }
