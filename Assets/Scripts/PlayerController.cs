@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Android;
 using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
@@ -21,6 +22,7 @@ public class PlayerController : MonoBehaviour
     public int rockCount = 2;
     bool throwMode = false;
     LineRenderer lr;
+    UIManager UI;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -37,89 +39,97 @@ public class PlayerController : MonoBehaviour
         throwAction = InputSystem.actions.FindAction("Throw");
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
+        UI = GameObject.FindGameObjectWithTag("UI").GetComponent<UIManager>();
     }
 
     // Update is called once per frame
     void FixedUpdate()
     {
-        crouch = crouchAction.ReadValue<float>();
-        sprint = sprintAction.ReadValue<float>();
-        float finalSpeed = speed;
-        if (crouch > 0)
+        if (!UI.paused)
         {
-            finalSpeed = crouchSpeed;
-        }
-        else if (sprint > 0)
-        {
-            finalSpeed = sprintSpeed;
-        }
-        move = moveAction.ReadValue<Vector2>() * finalSpeed * Time.fixedDeltaTime;
-        rb.MovePosition(rb.transform.position + transform.forward * move.y + transform.right * move.x);
-        if (move.magnitude > 0)
-        {
-            if (finalSpeed == speed && timeSinceStep > stepSpeed)
+            crouch = crouchAction.ReadValue<float>();
+            sprint = sprintAction.ReadValue<float>();
+            float finalSpeed = speed;
+            if (crouch > 0)
             {
-                gameManager.GetComponent<AudioController>().CreateSound(transform.position, "step", walkIntensity);
-                timeSinceStep = 0;
+                finalSpeed = crouchSpeed;
             }
-            else if (finalSpeed == sprintSpeed && timeSinceStep > sprintStepSpeed)
+            else if (sprint > 0)
             {
-                gameManager.GetComponent<AudioController>().CreateSound(transform.position, "run", sprintIntensity);
-                timeSinceStep = 0;
+                finalSpeed = sprintSpeed;
             }
-        }
-        timeSinceStep += Time.fixedDeltaTime;
-
-        look = lookAction.ReadValue<Vector2>() * rotationSpeed * Time.fixedDeltaTime;
-        Quaternion turnRotation = Quaternion.Euler(0f, look.x, 0f);
-        rb.MoveRotation(rb.rotation * turnRotation);
-
-        if (!throwMode)
-        {
-            float newLook = -look.y + view.transform.localEulerAngles.x;
-            if (newLook > 180)
+            move = moveAction.ReadValue<Vector2>() * finalSpeed * Time.fixedDeltaTime;
+            rb.MovePosition(rb.transform.position + transform.forward * move.y + transform.right * move.x);
+            if (move.magnitude > 0)
             {
-                newLook = Math.Clamp(newLook, 360 - maxLookAngle, 360);
+                if (finalSpeed == speed && timeSinceStep > stepSpeed)
+                {
+                    gameManager.GetComponent<AudioController>().CreateSound(transform.position, "step", walkIntensity);
+                    timeSinceStep = 0;
+                }
+                else if (finalSpeed == sprintSpeed && timeSinceStep > sprintStepSpeed)
+                {
+                    gameManager.GetComponent<AudioController>().CreateSound(transform.position, "run", sprintIntensity);
+                    timeSinceStep = 0;
+                }
+            }
+            timeSinceStep += Time.fixedDeltaTime;
+
+            look = lookAction.ReadValue<Vector2>() * rotationSpeed * Time.fixedDeltaTime;
+            Quaternion turnRotation = Quaternion.Euler(0f, look.x, 0f);
+            rb.MoveRotation(rb.rotation * turnRotation);
+
+            if (!throwMode)
+            {
+                float newLook = -look.y + view.transform.localEulerAngles.x;
+                if (newLook > 180)
+                {
+                    newLook = Math.Clamp(newLook, 360 - maxLookAngle, 360);
+                }
+                else
+                {
+                    newLook = Math.Clamp(newLook, -maxLookAngle, maxLookAngle);
+                }
+
+                view.transform.localEulerAngles = new Vector3(newLook, 0f, 0f);
             }
             else
             {
-                newLook = Math.Clamp(newLook, -maxLookAngle, maxLookAngle);
+                throwSpeed += look.y * throwModificationMultiplier;
             }
-
-            view.transform.localEulerAngles = new Vector3(newLook, 0f, 0f);
         }
-        else
-        {
-            throwSpeed += look.y * throwModificationMultiplier;
-        }
+        
 
     }
 
     void Update()
     {
-        if (throwAction.WasPressedThisFrame() && throwMode)
+        if (!UI.paused)
         {
-            throwMode = false;
-            lr.enabled = false;
-        }
-        else if (throwAction.WasPressedThisFrame() && rockCount > 0)
-        {
-            lr.enabled = true;
-            throwMode = true;
-        }
-        if (throwMode && interactAction.WasPressedThisFrame())
-        {
-            ThrowRock();
-            lr.enabled = false;
-            throwMode = false;
-        }
-        else if (interactAction.WasPressedThisFrame() && selection != null)
-        {
-            PickUp();
-        }
-        if (throwMode)
-        {
-            DrawTrajectory();
+            if (throwAction.WasPressedThisFrame() && throwMode)
+            {
+                throwMode = false;
+                lr.enabled = false;
+            }
+            else if (throwAction.WasPressedThisFrame() && rockCount > 0)
+            {
+                lr.enabled = true;
+                throwMode = true;
+            }
+            if (throwMode && interactAction.WasPressedThisFrame())
+            {
+                ThrowRock();
+                lr.enabled = false;
+                throwMode = false;
+            }
+            else if (interactAction.WasPressedThisFrame() && selection != null)
+            {
+                PickUp();
+            }
+            if (throwMode)
+            {
+                DrawTrajectory();
+            }
         }
     }
 
