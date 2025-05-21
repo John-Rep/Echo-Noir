@@ -9,7 +9,7 @@ public class PlayerController : MonoBehaviour
 
     Rigidbody rb;
     public float speed = 3f, sprintSpeed = 6f, crouchSpeed = 1.5f, maxLookAngle = 30;
-    public float stepSpeed = .7f, sprintStepSpeed = .3f, walkIntensity = 4.5f, sprintIntensity = 10f, throwSpeed = 8f, throwAngle = 45f, throwModificationMultiplier = .2f;
+    public float stepSpeed = .7f, sprintStepSpeed = .3f, walkIntensity = 4.5f, sprintIntensity = 10f, throwSpeed = 8f, throwAngle = 35f, throwModificationMultiplier = .2f;
     float timeSinceStep = 0f;
     InputAction moveAction, sprintAction, crouchAction, lookAction, throwAction, interactAction;
     Vector2 move, look;

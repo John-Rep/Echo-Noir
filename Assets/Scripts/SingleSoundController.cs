@@ -5,8 +5,8 @@ public class SingleSoundController : MonoBehaviour
 {
 
     float intensity;
-    float fadeSpeed = 6f;
-    float waitTime = .5f;
+    float fadeSpeed = 5f;
+    float waitTime = 1f;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
