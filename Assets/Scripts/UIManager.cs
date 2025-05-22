@@ -30,11 +30,19 @@ public class UIManager : MonoBehaviour
         {
             mainMenu.SetActive(true);
             gameUI.SetActive(false);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            paused = true;
+            Time.timeScale = 0;
         }
         else
         {
             mainMenu.SetActive(false);
             gameUI.SetActive(true);
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            paused = false;
+            Time.timeScale = 1;
         }
     }
 
