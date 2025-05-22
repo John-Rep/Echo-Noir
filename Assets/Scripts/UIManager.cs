@@ -15,9 +15,9 @@ public class UIManager : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
-        if (player != null)
+        if (GameObject.FindGameObjectWithTag("Player") != null)
         {
+            player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
             player.OnRockInteraction += UpdateRockCount;
         }
         mainMenu = transform.GetChild(0).gameObject;
@@ -29,10 +29,12 @@ public class UIManager : MonoBehaviour
         if (SceneManager.GetActiveScene().buildIndex == 0)
         {
             mainMenu.SetActive(true);
+            gameUI.SetActive(false);
         }
         else
         {
             mainMenu.SetActive(false);
+            gameUI.SetActive(true);
         }
     }
 
