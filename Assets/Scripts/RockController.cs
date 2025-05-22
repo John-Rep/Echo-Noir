@@ -4,7 +4,7 @@ using UnityEngine;
 public class RockController : MonoBehaviour
 {
     GameObject gameManager;
-    float intensityMultiplier = 5f;
+    float intensityMultiplier = 3.5f;
     Rigidbody rb;
     void Start()
     {
