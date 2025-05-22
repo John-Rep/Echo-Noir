@@ -1,18 +1,29 @@
+using TMPro;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
     public bool paused = false;
     GameObject gameUI, pauseMenu, mainMenu;
+    TextMeshProUGUI rockText;
     InputAction cancel;
+    PlayerController player;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerController>();
+        if (player != null)
+        {
+            player.OnRockInteraction += UpdateRockCount;
+        }
         mainMenu = transform.GetChild(0).gameObject;
         pauseMenu = transform.GetChild(1).gameObject;
+        gameUI = transform.GetChild(2).gameObject;
+        rockText = gameUI.GetComponentInChildren<TextMeshProUGUI>();
         cancel = InputSystem.actions.FindAction("Cancel");
         pauseMenu.SetActive(false);
         if (SceneManager.GetActiveScene().buildIndex == 0)
@@ -32,6 +43,11 @@ public class UIManager : MonoBehaviour
         {
             TogglePause();
         }
+    }
+
+    void UpdateRockCount(int rockCount)
+    {
+        rockText.text = "X " + rockCount;
     }
 
     public void TogglePause()

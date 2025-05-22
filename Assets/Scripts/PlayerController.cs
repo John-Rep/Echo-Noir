@@ -24,6 +24,8 @@ public class PlayerController : MonoBehaviour
     LineRenderer lr;
     UIManager UI;
 
+    public event Action<int> OnRockInteraction;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -40,6 +42,7 @@ public class PlayerController : MonoBehaviour
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
         UI = GameObject.FindGameObjectWithTag("UI").GetComponent<UIManager>();
+        OnRockInteraction?.Invoke(rockCount);
     }
 
     // Update is called once per frame
@@ -162,12 +165,14 @@ public class PlayerController : MonoBehaviour
         Vector3 direction = transform.forward + new Vector3(0, Mathf.Tan(throwAngle * Mathf.Deg2Rad), 0);
         newRock.GetComponent<Rigidbody>().linearVelocity = direction.normalized * throwSpeed;
         rockCount -= 1;
+        OnRockInteraction?.Invoke(rockCount);
     }
 
     void PickUp()
     {
         Destroy(selection);
         rockCount += 1;
+        OnRockInteraction?.Invoke(rockCount);
     }
 
     void DrawTrajectory()
