@@ -3,27 +3,22 @@ using UnityEngine;
 public class SelectionController : MonoBehaviour
 {
 
-    [SerializeField]
-    Material selectedMaterial;
-    Material defaultMaterial;
-
     MeshRenderer mr;
 
     void Start()
     {
-        mr = GetComponent<MeshRenderer>();
-        defaultMaterial = mr.material;
+        mr = transform.GetChild(0).gameObject.GetComponent<MeshRenderer>();
     }
 
 
     public void Select()
     {
-        mr.material = selectedMaterial;
+        mr.enabled = true;
     }
     
     public void UnSelect()
     {
-        mr.material = defaultMaterial;
+        mr.enabled = false;
     }
 
 }
