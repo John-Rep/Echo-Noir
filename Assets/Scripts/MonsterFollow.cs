@@ -1,31 +1,41 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 using UnityEngine.AI;
 
 public class MonsterFollow : MonoBehaviour
 {
-    [Header("Réglages du suivi")]
-    [Tooltip("Transform du joueur. Si laissé vide, on cherche automatiquement l'objet taggé 'Player'.")]
+    [Header("RÃ©glages du joueur")]
     public Transform player;
-    [Tooltip("Distance maximale pour commencer à poursuivre le joueur.")]
     public float detectionRadius = 15f;
-    [Tooltip("Vitesse de déplacement du monstre.")]
-    public float speed = 3.5f;
+    public float attackRadius = 2f;
+
+    [Header("Vitesse")]
+    public float chaseSpeed = 3.5f;      // Vitesse rapide en poursuite
+    public float wanderSpeed = 1.5f;     // Vitesse lente en errance
+
+    [Header("Errance alÃ©atoire")]
+    public float wanderRadius = 10f;
+    public float wanderInterval = 5f;
 
     private NavMeshAgent agent;
+    private Animator animator;
+    private bool isAttacking = false;
+    private float wanderTimer;
+    private Vector3 spawnPosition;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
-        agent.speed = speed;
+        animator = GetComponentInChildren<Animator>();
 
-        // Si on n’a pas assigné manuellement le player, on le cherche par tag
+        agent.speed = wanderSpeed; // Par dÃ©faut en mode errance
+        spawnPosition = transform.position;
+        wanderTimer = wanderInterval;
+
         if (player == null)
         {
             GameObject go = GameObject.FindGameObjectWithTag("Player");
             if (go != null)
                 player = go.transform;
-            else
-                Debug.LogWarning("MonsterFollow : aucun objet taggé 'Player' trouvé dans la scène.");
         }
     }
 
@@ -35,23 +45,87 @@ public class MonsterFollow : MonoBehaviour
 
         float distance = Vector3.Distance(transform.position, player.position);
 
+        // RÃ©glage de la vitesse de l'animator selon la situation (optionnel)
+        if (animator != null)
+        {
+            animator.SetFloat("Speed", agent.velocity.magnitude);
+        }
+
         if (distance <= detectionRadius)
         {
-            // Poursuite
+            agent.speed = chaseSpeed; // ðŸŸ¢ poursuite rapide
             agent.SetDestination(player.position);
+            if (animator != null)
+            {
+                animator.SetBool("IsChasing", true);
+                animator.speed = 1.0f; // vitesse normale pour les anims (optionnel)
+            }
+
+            if (distance <= attackRadius && !isAttacking)
+            {
+                if (animator != null)
+                    animator.SetTrigger("Attack");
+                isAttacking = true;
+                Invoke(nameof(EndAttack), 1.2f);
+            }
+            else if (distance > attackRadius)
+            {
+                isAttacking = false;
+            }
+            wanderTimer = wanderInterval;
         }
         else
         {
-            // Arrête la poursuite (reste sur place)
-            if (agent.hasPath)
-                agent.ResetPath();
+            agent.speed = wanderSpeed; // ðŸŸ¡ balade lente
+            if (animator != null)
+            {
+                animator.SetBool("IsChasing", false);
+                animator.speed = 0.7f; // cadence plus lente pour la marche (optionnel)
+            }
+
+            wanderTimer += Time.deltaTime;
+
+            if (wanderTimer >= wanderInterval || !agent.hasPath || agent.remainingDistance <= agent.stoppingDistance)
+            {
+                Vector3 newPos = RandomNavSphere(spawnPosition, wanderRadius);
+                agent.SetDestination(newPos);
+                wanderTimer = 0f;
+            }
+            isAttacking = false;
+        }
+        if (isAttacking && player != null)
+        {
+            Vector3 lookDirection = player.position - transform.position;
+            lookDirection.y = 0;
+            if (lookDirection != Vector3.zero)
+            {
+                Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
+                transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 7f);
+            }
         }
     }
 
-    // Optionnel : visualiser le rayon de détection dans l’éditeur
+    void EndAttack()
+    {
+        isAttacking = false;
+    }
+
+    Vector3 RandomNavSphere(Vector3 origin, float dist)
+    {
+        Vector3 randDirection = Random.insideUnitSphere * dist + origin;
+        randDirection.y = origin.y;
+        NavMeshHit navHit;
+        NavMesh.SamplePosition(randDirection, out navHit, dist, NavMesh.AllAreas);
+        return navHit.position;
+    }
+
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
+        Gizmos.color = Color.yellow;
+        Gizmos.DrawWireSphere(transform.position, attackRadius);
+        Gizmos.color = Color.green;
+        Gizmos.DrawWireSphere(Application.isPlaying ? spawnPosition : transform.position, wanderRadius);
     }
 }
