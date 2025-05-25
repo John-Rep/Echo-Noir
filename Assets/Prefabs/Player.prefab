@@ -294,7 +294,7 @@ MonoBehaviour:
   speed: 3
   sprintSpeed: 6
   crouchSpeed: 1.5
-  maxLookAngle: 30
+  maxLookAngle: 45
   stepSpeed: 0.7
   sprintStepSpeed: 0.3
   walkIntensity: 4.5
@@ -302,7 +302,7 @@ MonoBehaviour:
   throwSpeed: 8
   throwAngle: 35
   throwModificationMultiplier: 0.2
-  rotationSpeed: {x: 20, y: 5}
+  rotationSpeed: {x: 20, y: 20}
   rock: {fileID: 6436002347103123853, guid: c8c21cee4f8413d41a7661393b33a597, type: 3}
   rockCount: 2
 --- !u!135 &969791266143331588
@@ -351,6 +351,7 @@ LineRenderer:
   m_RendererPriority: 0
   m_Materials:
   - {fileID: 2100000, guid: 78b135aa08b16ff4db98e891c7b69f4a, type: 2}
+  - {fileID: 2100000, guid: 527fc11485d9ba34ebb7af069880e8f4, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
