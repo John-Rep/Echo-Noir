@@ -1,10 +1,11 @@
-﻿using UnityEngine;
+﻿using Unity.VisualScripting;
+using UnityEngine;
 using UnityEngine.AI;
 
 public class MonsterFollow : MonoBehaviour
 {
     [Header("Réglages du joueur")]
-    public Transform player;
+    // public Transform player;
     public float detectionRadius = 15f;
     public float attackRadius = 2f;
 
@@ -18,32 +19,50 @@ public class MonsterFollow : MonoBehaviour
 
     private NavMeshAgent agent;
     private Animator animator;
-    private bool isAttacking = false;
-    private float wanderTimer;
+    private bool isAttacking = false, isChasing = false;
+    private float wanderTimer, chaseCooldown, stepSpeed = .9f, stepIntensity = .2f, timeSinceStep;
     private Vector3 spawnPosition;
+    private GameObject gameManager;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponentInChildren<Animator>();
+        gameManager = GameObject.FindGameObjectWithTag("GameController");
 
         agent.speed = wanderSpeed; // Par défaut en mode errance
         spawnPosition = transform.position;
         wanderTimer = wanderInterval;
+        timeSinceStep = 0;
 
-        if (player == null)
+        if (animator != null)
+        {
+            animator.speed = 0.7f; // cadence plus lente pour la marche
+        }
+
+        /* if (player == null)
         {
             GameObject go = GameObject.FindGameObjectWithTag("Player");
             if (go != null)
                 player = go.transform;
+        } */
+    }
+
+    void FixedUpdate()
+    {
+        if (agent.velocity.magnitude > 0 && timeSinceStep > stepSpeed)
+        {
+            gameManager.GetComponent<AudioController>().CreateMonsterSound(transform.position, "step", stepIntensity);
+            timeSinceStep = 0;
         }
+        timeSinceStep += Time.fixedDeltaTime;
     }
 
     void Update()
     {
-        if (player == null) return;
+        // if (player == null) return;
 
-        float distance = Vector3.Distance(transform.position, player.position);
+        // float distance = Vector3.Distance(transform.position, player.position);
 
         // Réglage de la vitesse de l'animator selon la situation (optionnel)
         if (animator != null)
@@ -51,37 +70,18 @@ public class MonsterFollow : MonoBehaviour
             animator.SetFloat("Speed", agent.velocity.magnitude);
         }
 
-        if (distance <= detectionRadius)
+        
+        if (isChasing && agent.remainingDistance < agent.stoppingDistance)
         {
-            agent.speed = chaseSpeed; // 🟢 poursuite rapide
-            agent.SetDestination(player.position);
-            if (animator != null)
-            {
-                animator.SetBool("IsChasing", true);
-                animator.speed = 1.0f; // vitesse normale pour les anims (optionnel)
-            }
-
-            if (distance <= attackRadius && !isAttacking)
-            {
-                if (animator != null)
-                    animator.SetTrigger("Attack");
-                isAttacking = true;
-                Invoke(nameof(EndAttack), 1.2f);
-            }
-            else if (distance > attackRadius)
-            {
-                isAttacking = false;
-            }
-            wanderTimer = wanderInterval;
+            EndChase();
         }
-        else
+        if (chaseCooldown > 0)
         {
-            agent.speed = wanderSpeed; // 🟡 balade lente
-            if (animator != null)
-            {
-                animator.SetBool("IsChasing", false);
-                animator.speed = 0.7f; // cadence plus lente pour la marche (optionnel)
-            }
+            chaseCooldown -= Time.deltaTime;
+        }
+        if (!isChasing && chaseCooldown <= 0)
+        {
+            agent.speed = wanderSpeed;
 
             wanderTimer += Time.deltaTime;
 
@@ -91,9 +91,8 @@ public class MonsterFollow : MonoBehaviour
                 agent.SetDestination(newPos);
                 wanderTimer = 0f;
             }
-            isAttacking = false;
         }
-        if (isAttacking && player != null)
+        /* if (isAttacking && player != null)
         {
             Vector3 lookDirection = player.position - transform.position;
             lookDirection.y = 0;
@@ -102,6 +101,29 @@ public class MonsterFollow : MonoBehaviour
                 Quaternion targetRotation = Quaternion.LookRotation(lookDirection);
                 transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 7f);
             }
+        } */
+    }
+
+    public void NewChase(Vector3 destination)
+    {
+        agent.speed = chaseSpeed;
+        agent.SetDestination(destination);
+        if (animator != null)
+        {
+            animator.SetBool("IsChasing", true);
+            animator.speed = 1f; // cadence normale pour poursuite
+        }
+        isChasing = true;
+    }
+
+    void EndChase()
+    {
+        isChasing = false;
+        chaseCooldown = 2f;
+        if (animator != null)
+        {
+            animator.SetBool("IsChasing", false);
+            animator.speed = 0.7f; // cadence plus lente pour la marche
         }
     }
 

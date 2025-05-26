@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour
     public GameObject rock;
     public int rockCount = 2;
     bool throwMode = false;
+    public bool dead = false, win = false;
     LineRenderer lr;
     UIManager UI;
 
@@ -45,7 +46,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        if (!UI.paused)
+        if (!UI.paused && !UI.endLevel)
         {
             crouch = crouchAction.ReadValue<float>();
             sprint = sprintAction.ReadValue<float>();
@@ -100,7 +101,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        if (!UI.paused)
+        if (!UI.paused && !UI.endLevel)
         {
             if (throwAction.WasPressedThisFrame() && throwMode)
             {
@@ -139,6 +140,18 @@ public class PlayerController : MonoBehaviour
             }
             selection = other.gameObject;
             selection.GetComponent<SelectionController>().Select();
+        }
+        else if (other.CompareTag("Monster"))
+        {
+            dead = true;
+        }
+        else if (other.CompareTag("Goal"))
+        {
+            win = true;
+        }
+        else if (other.CompareTag("Lever"))
+        {
+            other.GetComponent<LeverController>().Activate();
         }
     }
 
