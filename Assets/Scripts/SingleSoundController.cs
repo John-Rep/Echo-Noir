@@ -18,7 +18,6 @@ public class SingleSoundController : MonoBehaviour
         {
             if (hit.CompareTag("Monster") && !monsterGenerated)
             {
-                Debug.Log("New Sound Detected by Monster");
                 hit.GetComponent<MonsterFollow>().NewChase(transform.position);
             }
         }
