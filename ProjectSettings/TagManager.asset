@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Item
   - UI
+  - Monster
   layers:
   - Default
   - TransparentFX

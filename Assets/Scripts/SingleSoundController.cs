@@ -1,3 +1,4 @@
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -7,14 +8,24 @@ public class SingleSoundController : MonoBehaviour
     float intensity;
     float fadeSpeed = 5f;
     float waitTime = 1f;
+    public bool monsterGenerated = false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-
+        Collider[] hits;
+        hits = Physics.OverlapSphere(transform.position, intensity);
+        foreach (Collider hit in hits)
+        {
+            if (hit.CompareTag("Monster"))
+            {
+                Debug.Log("New Sound Detected by Monster");
+                hit.GetComponent<MonsterFollow>().NewChase(transform.position);
+            }
+        }
     }
 
     // Update is called once per frame
-    void Update()
+        void Update()
     {
         if (waitTime > 0)
         {
