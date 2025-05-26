@@ -57,15 +57,18 @@ public class UIManager : MonoBehaviour
         {
             TogglePause();
         }
-        if (player.dead)
+        if (player != null)
         {
-            loseScreen.SetActive(true);
-            EndLevel();
-        }
-        else if (player.win)
-        {
-            winScreen.SetActive(true);
-            EndLevel();
+            if (player.dead)
+            {
+                loseScreen.SetActive(true);
+                EndLevel();
+            }
+            else if (player.win)
+            {
+                winScreen.SetActive(true);
+                EndLevel();
+            }
         }
     }
 
