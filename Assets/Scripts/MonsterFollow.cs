@@ -20,17 +20,25 @@ public class MonsterFollow : MonoBehaviour
     private NavMeshAgent agent;
     private Animator animator;
     private bool isAttacking = false, isChasing = false;
-    private float wanderTimer, chaseCooldown;
+    private float wanderTimer, chaseCooldown, stepSpeed = .9f, stepIntensity = .2f, timeSinceStep;
     private Vector3 spawnPosition;
+    private GameObject gameManager;
 
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponentInChildren<Animator>();
+        gameManager = GameObject.FindGameObjectWithTag("GameController");
 
         agent.speed = wanderSpeed; // Par défaut en mode errance
         spawnPosition = transform.position;
         wanderTimer = wanderInterval;
+        timeSinceStep = 0;
+
+        if (animator != null)
+        {
+            animator.speed = 0.7f; // cadence plus lente pour la marche
+        }
 
         /* if (player == null)
         {
@@ -38,6 +46,16 @@ public class MonsterFollow : MonoBehaviour
             if (go != null)
                 player = go.transform;
         } */
+    }
+
+    void FixedUpdate()
+    {
+        if (agent.velocity.magnitude > 0 && timeSinceStep > stepSpeed)
+        {
+            gameManager.GetComponent<AudioController>().CreateMonsterSound(transform.position, "step", stepIntensity);
+            timeSinceStep = 0;
+        }
+        timeSinceStep += Time.fixedDeltaTime;
     }
 
     void Update()

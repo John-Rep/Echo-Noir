@@ -16,7 +16,7 @@ public class SingleSoundController : MonoBehaviour
         hits = Physics.OverlapSphere(transform.position, intensity);
         foreach (Collider hit in hits)
         {
-            if (hit.CompareTag("Monster"))
+            if (hit.CompareTag("Monster") && !monsterGenerated)
             {
                 Debug.Log("New Sound Detected by Monster");
                 hit.GetComponent<MonsterFollow>().NewChase(transform.position);

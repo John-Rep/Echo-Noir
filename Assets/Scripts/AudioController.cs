@@ -15,6 +15,16 @@ public class AudioController : MonoBehaviour
         soundSphere.GetComponent<SingleSoundController>().SetIntensity(intensity);
     }
 
+    public void CreateMonsterSound(Vector3 location, string audio, float intensity)
+    {
+        GameObject soundSphere = Instantiate(soundObject, location, new Quaternion(0, 0, 0, 0));
+        AudioSource sound = soundSphere.GetComponent<AudioSource>();
+        sound.resource = getSound(audio);
+        sound.Play();
+        soundSphere.GetComponent<SingleSoundController>().SetIntensity(intensity);
+        soundSphere.GetComponent<SingleSoundController>().monsterGenerated = true;
+    }
+
     private AudioResource getSound(string sound)
     {
         switch (sound)
