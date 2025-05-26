@@ -6,8 +6,8 @@ using UnityEngine.UI;
 
 public class UIManager : MonoBehaviour
 {
-    public bool paused = false;
-    GameObject gameUI, pauseMenu, mainMenu;
+    public bool paused = false, endLevel = false;
+    GameObject gameUI, pauseMenu, mainMenu, loseScreen, winScreen;
     TextMeshProUGUI rockText;
     InputAction cancel;
     PlayerController player;
@@ -23,6 +23,8 @@ public class UIManager : MonoBehaviour
         mainMenu = transform.GetChild(0).gameObject;
         pauseMenu = transform.GetChild(1).gameObject;
         gameUI = transform.GetChild(2).gameObject;
+        loseScreen = transform.GetChild(3).gameObject;
+        winScreen = transform.GetChild(4).gameObject;
         rockText = gameUI.GetComponentInChildren<TextMeshProUGUI>();
         cancel = InputSystem.actions.FindAction("Cancel");
         pauseMenu.SetActive(false);
@@ -44,15 +46,34 @@ public class UIManager : MonoBehaviour
             paused = false;
             Time.timeScale = 1;
         }
+        loseScreen.SetActive(false);
+        winScreen.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (cancel.WasPressedThisFrame())
+        if (cancel.WasPressedThisFrame() && !endLevel)
         {
             TogglePause();
         }
+        if (player.dead)
+        {
+            loseScreen.SetActive(true);
+            EndLevel();
+        }
+        else if (player.win)
+        {
+            winScreen.SetActive(true);
+            EndLevel();
+        }
+    }
+
+    void EndLevel()
+    {
+        endLevel = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     void UpdateRockCount(int rockCount)

@@ -305,6 +305,8 @@ MonoBehaviour:
   rotationSpeed: {x: 20, y: 20}
   rock: {fileID: 6436002347103123853, guid: c8c21cee4f8413d41a7661393b33a597, type: 3}
   rockCount: 2
+  dead: 0
+  win: 0
 --- !u!135 &969791266143331588
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -324,8 +326,8 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.96
-  m_Center: {x: 0, y: -0.47, z: 1.34}
+  m_Radius: 1.32
+  m_Center: {x: 0, y: -0, z: 1.3400002}
 --- !u!120 &6499698259190051548
 LineRenderer:
   serializedVersion: 2

@@ -7,6 +7,9 @@ TagManager:
   - Item
   - UI
   - Monster
+  - Door
+  - Goal
+  - Lever
   layers:
   - Default
   - TransparentFX
