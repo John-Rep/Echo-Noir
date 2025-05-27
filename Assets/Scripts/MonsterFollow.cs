@@ -20,7 +20,7 @@ public class MonsterFollow : MonoBehaviour
     private NavMeshAgent agent;
     private Animator animator;
     private bool isAttacking = false, isChasing = false;
-    private float wanderTimer, chaseCooldown, stepSpeed = .9f, stepIntensity = .2f, timeSinceStep;
+    private float wanderTimer, chaseCooldown, stepSpeed = .9f, stepIntensity = 3f, timeSinceStep;
     private Vector3 spawnPosition;
     private GameObject gameManager;
 
@@ -52,7 +52,7 @@ public class MonsterFollow : MonoBehaviour
     {
         if (agent.velocity.magnitude > 0 && timeSinceStep > stepSpeed)
         {
-            gameManager.GetComponent<AudioController>().CreateMonsterSound(transform.position, "step", stepIntensity);
+            gameManager.GetComponent<AudioController>().CreateMonsterSound(transform.position + transform.up * .5f, "step", stepIntensity);
             timeSinceStep = 0;
         }
         timeSinceStep += Time.fixedDeltaTime;
