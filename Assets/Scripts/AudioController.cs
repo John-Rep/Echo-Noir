@@ -13,6 +13,7 @@ public class AudioController : MonoBehaviour
         sound.resource = getSound(audio);
         sound.Play();
         soundSphere.GetComponent<SingleSoundController>().SetIntensity(intensity);
+        soundSphere.GetComponent<Light>().color = Config.instance.lightColor * intensity / Config.instance.averageIntensity;
     }
 
     public void CreateMonsterSound(Vector3 location, string audio, float intensity)
@@ -22,6 +23,7 @@ public class AudioController : MonoBehaviour
         sound.resource = getSound(audio);
         sound.Play();
         soundSphere.GetComponent<SingleSoundController>().SetIntensity(intensity);
+        soundSphere.GetComponent<Light>().color = Config.instance.lightColor * intensity / Config.instance.averageIntensity;
         soundSphere.GetComponent<SingleSoundController>().monsterGenerated = true;
     }
 

@@ -32,8 +32,17 @@ public class SingleSoundController : MonoBehaviour
         }
         else
         {
+            float multiplier;
             intensity -= fadeSpeed * Time.deltaTime;
-            GetComponent<Light>().intensity = intensity;
+            if (intensity > 1)
+            {
+                multiplier = intensity;
+            }
+            else
+            {
+                multiplier = Config.instance.animationCurve.Evaluate(intensity);
+            }
+            GetComponent<Light>().color = Config.instance.lightColor * multiplier / Config.instance.averageIntensity;
             if (intensity <= 0)
             {
                 Destroy(gameObject);
