@@ -7,7 +7,7 @@ using UnityEngine.UI;
 public class UIManager : MonoBehaviour
 {
     public bool paused = false, endLevel = false;
-    GameObject gameUI, pauseMenu, mainMenu, loseScreen, winScreen;
+    GameObject gameUI, pauseMenu, mainMenu, loseScreen, winScreen, introScreen;
     TextMeshProUGUI rockText;
     InputAction cancel;
     PlayerController player;
@@ -25,6 +25,10 @@ public class UIManager : MonoBehaviour
         gameUI = transform.GetChild(2).gameObject;
         loseScreen = transform.GetChild(3).gameObject;
         winScreen = transform.GetChild(4).gameObject;
+        if (SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            introScreen = transform.GetChild(5).gameObject;
+        }
         rockText = gameUI.GetComponentInChildren<TextMeshProUGUI>();
         cancel = InputSystem.actions.FindAction("Cancel");
         pauseMenu.SetActive(false);
@@ -36,6 +40,16 @@ public class UIManager : MonoBehaviour
             Cursor.visible = true;
             paused = true;
             Time.timeScale = 0;
+        }
+        else if (SceneManager.GetActiveScene().buildIndex == 1)
+        {
+            mainMenu.SetActive(false);
+            gameUI.SetActive(false);
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+            paused = true;
+            Time.timeScale = 0;
+            introScreen.SetActive(true);
         }
         else
         {
@@ -53,7 +67,14 @@ public class UIManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (cancel.WasPressedThisFrame() && !endLevel)
+        if (cancel.WasPressedThisFrame() && introScreen.activeSelf)
+        {
+            introScreen.SetActive(false);
+            Cursor.lockState = CursorLockMode.Locked;
+            Cursor.visible = false;
+            Time.timeScale = 1;
+            paused = false;
+        } else if (cancel.WasPressedThisFrame() && !endLevel)
         {
             TogglePause();
         }
